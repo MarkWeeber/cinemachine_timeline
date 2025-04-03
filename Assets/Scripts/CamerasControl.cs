@@ -2,6 +2,7 @@ using System.Collections;
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class CamerasControl : MonoBehaviour
 {
@@ -16,11 +17,12 @@ public class CamerasControl : MonoBehaviour
     private InputActions _inputActions;
     private IEnumerator _waitForCinematicRoutine;
     private Vector2 _mouseMovementDelta;
+    private Player _player;
 
     private void Start()
     {
-        _inputActions = new InputActions();
-        _inputActions.Enable();
+        _player = GameObject.Find("SpaceShip").GetComponent<Player>();
+        _inputActions = _player.InputActions;
         _inputActions.Player.Switch_Camera.performed += SwitchView;
         _inputActions.Player.AnyKey.performed += SwitchFromCinematic;
         _inputActions.Menu.Exit.performed += ExitApplication;
@@ -41,12 +43,11 @@ public class CamerasControl : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         _inputActions.Player.Switch_Camera.performed -= SwitchView;
         _inputActions.Player.AnyKey.performed -= SwitchFromCinematic;
         _inputActions.Menu.Exit.performed -= ExitApplication;
-        _inputActions.Disable();
     }
 
     private void SwitchToControlledView()

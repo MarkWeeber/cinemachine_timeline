@@ -53,6 +53,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Steering"",
+                    ""type"": ""Value"",
+                    ""id"": ""3d5de571-27fc-40ae-a027-e0701f45c0b7"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -88,6 +97,61 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""AnyKey"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""7bb7830f-71e8-4eea-aafd-215aa3c869c8"",
+                    ""path"": ""2DVector(mode=1)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Steering"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""9cdaf567-fc90-45c5-ac71-6f420d4a814e"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Steering"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""9ee9befe-71b1-4896-b4f8-62d0a889d7fa"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Steering"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""13429733-9003-4139-b0b9-013db998b2d5"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Steering"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""8d2726bb-7f78-421b-9df5-c593e602a46f"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Steering"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -127,6 +191,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Player_Switch_Camera = m_Player.FindAction("Switch_Camera", throwIfNotFound: true);
         m_Player_MouseMovement = m_Player.FindAction("MouseMovement", throwIfNotFound: true);
         m_Player_AnyKey = m_Player.FindAction("AnyKey", throwIfNotFound: true);
+        m_Player_Steering = m_Player.FindAction("Steering", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Exit = m_Menu.FindAction("Exit", throwIfNotFound: true);
@@ -194,6 +259,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Switch_Camera;
     private readonly InputAction m_Player_MouseMovement;
     private readonly InputAction m_Player_AnyKey;
+    private readonly InputAction m_Player_Steering;
     public struct PlayerActions
     {
         private @InputActions m_Wrapper;
@@ -201,6 +267,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @Switch_Camera => m_Wrapper.m_Player_Switch_Camera;
         public InputAction @MouseMovement => m_Wrapper.m_Player_MouseMovement;
         public InputAction @AnyKey => m_Wrapper.m_Player_AnyKey;
+        public InputAction @Steering => m_Wrapper.m_Player_Steering;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -219,6 +286,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @AnyKey.started += instance.OnAnyKey;
             @AnyKey.performed += instance.OnAnyKey;
             @AnyKey.canceled += instance.OnAnyKey;
+            @Steering.started += instance.OnSteering;
+            @Steering.performed += instance.OnSteering;
+            @Steering.canceled += instance.OnSteering;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -232,6 +302,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @AnyKey.started -= instance.OnAnyKey;
             @AnyKey.performed -= instance.OnAnyKey;
             @AnyKey.canceled -= instance.OnAnyKey;
+            @Steering.started -= instance.OnSteering;
+            @Steering.performed -= instance.OnSteering;
+            @Steering.canceled -= instance.OnSteering;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -300,6 +373,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnSwitch_Camera(InputAction.CallbackContext context);
         void OnMouseMovement(InputAction.CallbackContext context);
         void OnAnyKey(InputAction.CallbackContext context);
+        void OnSteering(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {
