@@ -2,7 +2,6 @@ using System.Collections;
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class CamerasControl : MonoBehaviour
 {
@@ -17,18 +16,14 @@ public class CamerasControl : MonoBehaviour
     private InputActions _inputActions;
     private IEnumerator _waitForCinematicRoutine;
     private Vector2 _mouseMovementDelta;
-    private Player _player;
 
     private void Start()
     {
-        _player = GameObject.Find("SpaceShip").GetComponent<Player>();
-        _inputActions = _player.InputActions;
+        _inputActions = InputSystem.Instance.InputActions;
         _inputActions.Player.Switch_Camera.performed += SwitchView;
         _inputActions.Player.AnyKey.performed += SwitchFromCinematic;
         _inputActions.Menu.Exit.performed += ExitApplication;
-        SwitchToControlledView();
         _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
-        StartCoroutine(_waitForCinematicRoutine);
     }
 
     private void Update()
@@ -37,9 +32,7 @@ public class CamerasControl : MonoBehaviour
         if (_mouseMovementDelta.x != 0f || _mouseMovementDelta.y != 0f)
         {
             SwitchToControlledView();
-            StopCoroutine(_waitForCinematicRoutine);
-            _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
-            StartCoroutine(_waitForCinematicRoutine);
+            StartSwitchOverCoroutine();
         }
     }
 
@@ -48,6 +41,13 @@ public class CamerasControl : MonoBehaviour
         _inputActions.Player.Switch_Camera.performed -= SwitchView;
         _inputActions.Player.AnyKey.performed -= SwitchFromCinematic;
         _inputActions.Menu.Exit.performed -= ExitApplication;
+    }
+
+    public void StartSwitchOverCoroutine()
+    {
+        StopCoroutine(_waitForCinematicRoutine);
+        _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
+        StartCoroutine(_waitForCinematicRoutine);
     }
 
     private void SwitchToControlledView()
@@ -64,7 +64,6 @@ public class CamerasControl : MonoBehaviour
 
     private void SwitchView(InputAction.CallbackContext context)
     {
-        StopCoroutine(_waitForCinematicRoutine);
         if (_interiorView)
         {
             SwitchToExteriorLook();
@@ -75,30 +74,29 @@ public class CamerasControl : MonoBehaviour
             SwitchToInteriorLook();
             _interiorView = true;
         }
-        _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
-        StartCoroutine(_waitForCinematicRoutine);
+        StartSwitchOverCoroutine();
     }
 
     private void SwitchFromCinematic(InputAction.CallbackContext context)
     {
-        StopCoroutine(_waitForCinematicRoutine);
         SwitchToControlledView();
-        _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
-        StartCoroutine(_waitForCinematicRoutine);
+        StartSwitchOverCoroutine();
     }
 
-    private void SwitchToExteriorLook()
+    public void SwitchToExteriorLook()
     {
         _exteriorCamera.m_Priority = 20;
         _interiorCamera.m_Priority = 1;
         Camera.main.cullingMask = _exteriorLook;
+        _interiorView = false;
     }
 
-    private void SwitchToInteriorLook()
+    public void SwitchToInteriorLook()
     {
         _interiorCamera.m_Priority = 20;
         _exteriorCamera.m_Priority = 1;
         Camera.main.cullingMask = _interiorLook;
+        _interiorView = true;
     }
 
     private void SwitchToCinematicView()

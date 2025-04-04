@@ -62,6 +62,33 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Accelerate"",
+                    ""type"": ""Button"",
+                    ""id"": ""83b9f4ec-553f-4b85-acc4-40c011270dc6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Deccelarate"",
+                    ""type"": ""Button"",
+                    ""id"": ""1c335f26-ecd9-4a09-95db-6457ed39e70f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Rolling"",
+                    ""type"": ""Value"",
+                    ""id"": ""35b2e8d7-a74a-41b0-8152-a0fd13d0ce6c"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -101,7 +128,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""2D Vector"",
                     ""id"": ""7bb7830f-71e8-4eea-aafd-215aa3c869c8"",
-                    ""path"": ""2DVector(mode=1)"",
+                    ""path"": ""2DVector(mode=2)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -152,6 +179,61 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Steering"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6426d75a-2319-4d4e-abad-70f843db2819"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Accelerate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2a65a73c-ffb7-473a-90c0-995a35729b8d"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Deccelarate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""ac752cc2-f929-48f7-b601-8bb318da2ec8"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rolling"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""842e1b22-cf1f-4e83-b65b-f075d4c638c1"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rolling"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""d20905ff-a093-4a40-adb0-1e05a0628a60"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rolling"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -192,6 +274,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Player_MouseMovement = m_Player.FindAction("MouseMovement", throwIfNotFound: true);
         m_Player_AnyKey = m_Player.FindAction("AnyKey", throwIfNotFound: true);
         m_Player_Steering = m_Player.FindAction("Steering", throwIfNotFound: true);
+        m_Player_Accelerate = m_Player.FindAction("Accelerate", throwIfNotFound: true);
+        m_Player_Deccelarate = m_Player.FindAction("Deccelarate", throwIfNotFound: true);
+        m_Player_Rolling = m_Player.FindAction("Rolling", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Exit = m_Menu.FindAction("Exit", throwIfNotFound: true);
@@ -260,6 +345,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MouseMovement;
     private readonly InputAction m_Player_AnyKey;
     private readonly InputAction m_Player_Steering;
+    private readonly InputAction m_Player_Accelerate;
+    private readonly InputAction m_Player_Deccelarate;
+    private readonly InputAction m_Player_Rolling;
     public struct PlayerActions
     {
         private @InputActions m_Wrapper;
@@ -268,6 +356,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @MouseMovement => m_Wrapper.m_Player_MouseMovement;
         public InputAction @AnyKey => m_Wrapper.m_Player_AnyKey;
         public InputAction @Steering => m_Wrapper.m_Player_Steering;
+        public InputAction @Accelerate => m_Wrapper.m_Player_Accelerate;
+        public InputAction @Deccelarate => m_Wrapper.m_Player_Deccelarate;
+        public InputAction @Rolling => m_Wrapper.m_Player_Rolling;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -289,6 +380,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Steering.started += instance.OnSteering;
             @Steering.performed += instance.OnSteering;
             @Steering.canceled += instance.OnSteering;
+            @Accelerate.started += instance.OnAccelerate;
+            @Accelerate.performed += instance.OnAccelerate;
+            @Accelerate.canceled += instance.OnAccelerate;
+            @Deccelarate.started += instance.OnDeccelarate;
+            @Deccelarate.performed += instance.OnDeccelarate;
+            @Deccelarate.canceled += instance.OnDeccelarate;
+            @Rolling.started += instance.OnRolling;
+            @Rolling.performed += instance.OnRolling;
+            @Rolling.canceled += instance.OnRolling;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -305,6 +405,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Steering.started -= instance.OnSteering;
             @Steering.performed -= instance.OnSteering;
             @Steering.canceled -= instance.OnSteering;
+            @Accelerate.started -= instance.OnAccelerate;
+            @Accelerate.performed -= instance.OnAccelerate;
+            @Accelerate.canceled -= instance.OnAccelerate;
+            @Deccelarate.started -= instance.OnDeccelarate;
+            @Deccelarate.performed -= instance.OnDeccelarate;
+            @Deccelarate.canceled -= instance.OnDeccelarate;
+            @Rolling.started -= instance.OnRolling;
+            @Rolling.performed -= instance.OnRolling;
+            @Rolling.canceled -= instance.OnRolling;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -374,6 +483,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnMouseMovement(InputAction.CallbackContext context);
         void OnAnyKey(InputAction.CallbackContext context);
         void OnSteering(InputAction.CallbackContext context);
+        void OnAccelerate(InputAction.CallbackContext context);
+        void OnDeccelarate(InputAction.CallbackContext context);
+        void OnRolling(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {
