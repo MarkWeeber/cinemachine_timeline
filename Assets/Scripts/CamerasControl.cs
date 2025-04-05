@@ -21,25 +21,17 @@ public class CamerasControl : MonoBehaviour
     {
         _inputActions = InputSystem.Instance.InputActions;
         _inputActions.Player.Switch_Camera.performed += SwitchView;
-        _inputActions.Player.AnyKey.performed += SwitchFromCinematic;
+        _inputActions.Player.AnyKey.started += SwitchFromCinematic;
+        _inputActions.Player.AnyKey.canceled += SwitchToCoroutine;
         _inputActions.Menu.Exit.performed += ExitApplication;
         _waitForCinematicRoutine = CinematicSwitchRoutine(_switchToCinematicViewTime);
-    }
-
-    private void Update()
-    {
-        _mouseMovementDelta = _inputActions.Player.MouseMovement.ReadValue<Vector2>();
-        if (_mouseMovementDelta.x != 0f || _mouseMovementDelta.y != 0f)
-        {
-            SwitchToControlledView();
-            StartSwitchOverCoroutine();
-        }
     }
 
     private void OnDestroy()
     {
         _inputActions.Player.Switch_Camera.performed -= SwitchView;
-        _inputActions.Player.AnyKey.performed -= SwitchFromCinematic;
+        _inputActions.Player.AnyKey.started -= SwitchFromCinematic;
+        _inputActions.Player.AnyKey.canceled -= SwitchToCoroutine;
         _inputActions.Menu.Exit.performed -= ExitApplication;
     }
 
@@ -74,12 +66,16 @@ public class CamerasControl : MonoBehaviour
             SwitchToInteriorLook();
             _interiorView = true;
         }
-        StartSwitchOverCoroutine();
     }
 
     private void SwitchFromCinematic(InputAction.CallbackContext context)
     {
         SwitchToControlledView();
+        StopCoroutine(_waitForCinematicRoutine);
+    }
+
+    private void SwitchToCoroutine(InputAction.CallbackContext context)
+    {
         StartSwitchOverCoroutine();
     }
 
